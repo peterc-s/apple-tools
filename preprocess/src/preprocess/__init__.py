@@ -241,6 +241,12 @@ class Preprocess:
         # include resolving loop
         includes_found = True
         while includes_found:
+            # upper
+            self._upper()
+            if verbose:
+                print("-- after uppercasing --")
+                self._print()
+
             # includes
             includes_found = self._handle_includes()
             if verbose:
@@ -257,12 +263,6 @@ class Preprocess:
         self._remove_empty_lines()
         if verbose:
             print("-- after removing empty lines --")
-            self._print()
-
-        # upper
-        self._upper()
-        if verbose:
-            print("-- after uppercasing --")
             self._print()
 
         # resolve entry + add goto jump
