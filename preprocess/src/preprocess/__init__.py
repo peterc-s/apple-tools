@@ -20,9 +20,31 @@ class Preprocess:
     def __init__(self):
         pass
 
-    def _strip_lines(self):
+    def _upper(self):
         for line_num, line in enumerate(self.code):
-            self.code[line_num] = line.strip()
+            parts = re.split(r'(".*?")', line)
+
+            for i, part in enumerate(parts):
+                if i % 2 == 0:  # outside quotes
+                    parts[i] = part.upper()
+
+            self.code[line_num] = "".join(parts)
+
+    def _remove_remarks(self):
+        new_code = []
+
+        for _, line in enumerate(self.code):
+            parts = re.split(r'(".*?")', line)
+            remark_found = False
+
+            for i, part in enumerate(parts):
+                if i % 2 == 0 and "REM" in part:  # remark found outside quotes
+                    remark_found = True
+
+            if not remark_found:
+                new_code.append(line)
+
+        self.code = new_code
 
     def _mark_entry_point(self):
         entry_count = 0
@@ -83,18 +105,12 @@ class Preprocess:
         self.code = new_code
         return include_found
 
+    def _strip_lines(self):
+        for line_num, line in enumerate(self.code):
+            self.code[line_num] = line.strip()
+
     def _remove_empty_lines(self):
         self.code = list(filter(lambda line: len(line) != 0, self.code))
-
-    def _upper(self):
-        for idx, line in enumerate(self.code):
-            parts = re.split(r'(".*?")', line)
-
-            for i, part in enumerate(parts):
-                if i % 2 == 0:  # outside quotes
-                    parts[i] = part.upper()
-
-            self.code[idx] = "".join(parts)
 
     def _collect_and_remove_labels(self):
         for line_num, line in enumerate(self.code):
@@ -232,6 +248,19 @@ class Preprocess:
             self._print()
 
         ## passes
+        # upper ready for REM removal
+        self._upper()
+        if verbose:
+            print("-- after uppercasing --")
+            self._print()
+
+        # hacky but remove remarks once first so that the entrypoint is
+        # properly marked
+        self._remove_remarks()
+        if verbose:
+            print("-- after removing remarks --")
+            self._print()
+
         # mark the entry point
         self._mark_entry_point()
         if verbose:
@@ -263,6 +292,11 @@ class Preprocess:
         self._remove_empty_lines()
         if verbose:
             print("-- after removing empty lines --")
+            self._print()
+
+        self._remove_remarks()
+        if verbose:
+            print("-- after removing remarks --")
             self._print()
 
         # resolve entry + add goto jump
