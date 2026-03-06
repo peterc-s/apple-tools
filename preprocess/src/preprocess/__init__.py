@@ -7,14 +7,15 @@ LABEL_REGEX = re.compile(r"^<([A-Za-z_]\w*)>\s*(.*)")
 AT_LABEL_REGEX = re.compile(r"@([A-Za-z_]\w*)")
 
 
+def read_file(file: Path) -> list[str]:
+    with open(file, "r") as f:
+        return f.readlines()
+
+
 class Preprocess:
+
     def __init__(self):
         pass
-
-    @staticmethod
-    def _read_file(file: Path) -> list[str]:
-        with open(file, "r") as f:
-            return f.readlines()
 
     def _strip_lines(self):
         for line_num, line in enumerate(self.code):
@@ -104,9 +105,17 @@ class Preprocess:
             print(line.strip())
         print()
 
-    def __call__(self, file: Path, verbose: bool = False):
+    def run(self, file: Path, verbose: bool = False):
+        """
+        Preprocesses a set of files into a single, usable, basic program.
+
+        Allows for usage of <labels> at the start of lines and @labels to sub in
+        the correct line number.
+
+        Automatically adds line numbers but supports manual line numbering.
+        """
         self.file = file
-        self.code = self._read_file(file)
+        self.code = read_file(file)
         self.labels: dict[str, int] = {}
 
         if verbose:
@@ -156,4 +165,4 @@ class Preprocess:
 
 
 def main() -> None:
-    fire.Fire(Preprocess)
+    fire.Fire(Preprocess().run)
