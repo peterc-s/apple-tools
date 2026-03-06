@@ -66,11 +66,7 @@ class Graphics:
                     )
                 col_idx += len(group[1])
 
-        print(
-            "\n".join(
-                [f"{(i + 1) * 10} {line}" for i, line in enumerate(out)],
-            ),
-        )
+        print("\n".join(out))
 
 
 def main() -> None:
