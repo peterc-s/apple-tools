@@ -99,3 +99,5 @@ As for the current jank, there is no proper relative includes. For example:
 
 If `lib.bas` had `#INCLUDE "lib2.bas"`, this would not work (assuming we passed `main.bas` to the preprocessor). `lib.bas` would instead need `#INCLUDE "lib/lib2.bas"`. This is because the include path always comes from the "main" file.
 
+### Remark Removal
+The preprocessor also removes remarks.
