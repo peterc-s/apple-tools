@@ -1,7 +1,7 @@
 [project]
 name = "preprocess"
 version = "0.1.0"
-description = "Add your description here"
+description = "Super Basic Applesoft BASIC Preprocessor"
 readme = "README.md"
 authors = [
     { name = "peterc-s", email = "petercs@purelymail.com" }
