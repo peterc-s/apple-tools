@@ -1,69 +1,29 @@
-# RUN: uv run preprocess %s | filecheck %s
-
-<START> PRINT "NUMBER GUESSING GAME"
-PRINT "I am thinking of a number from 1 to 10"
-
-REM generate number from 1-10
-<NEWGAME> N = INT(RND(1)*10)+1
-PRINT
-PRINT "Guess the number."
-
-REM the main game loop
-<GAMELOOP> INPUT "Your guess: ";G
-W = 0
-GOSUB @CHECKGUESS
-IF W = 1 THEN @WIN
-GOTO @GAMELOOP
-
-REM checks where G is relative to N
-<CHECKGUESS> IF G = N THEN @CORRECT
-IF G < N THEN @LOW
-IF G > N THEN @HIGH
-RETURN
-
-REM set win flag if correct
-<CORRECT> W = 1
-RETURN
-
-<LOW> PRINT "TOO LOW"
-RETURN
-
-<HIGH> PRINT "TOO HIGH"
-RETURN
-
-<WIN> PRINT "CORRECT!"
-
-<GAMEOVER> INPUT "Play again? (1=yes, 2=no): ";A
-ON A GOTO @NEWGAME,@END
-GOTO @GAMEOVER
-
-<END> PRINT "Goodbye!"
-END
+# RUN: uv run preprocess ../examples/numberguess.bas | filecheck %s
 
 # CHECK: 0 PRINT "NUMBER GUESSING GAME"
-# CHECK: 1 PRINT "I am thinking of a number from 1 to 10"
-# CHECK: 2 N = INT(RND(1)*10)+1
-# CHECK: 3 PRINT
-# CHECK: 4 PRINT "Guess the number."
-# CHECK: 5 INPUT "Your guess: ";G
-# CHECK: 6 W = 0
-# CHECK: 7 GOSUB 10
-# CHECK: 8 IF W = 1 THEN 20
-# CHECK: 9 GOTO 5
-# CHECK: 10 IF G = N THEN 14
-# CHECK: 11 IF G < N THEN 16
-# CHECK: 12 IF G > N THEN 18
-# CHECK: 13 RETURN
-# CHECK: 14 W = 1
-# CHECK: 15 RETURN
-# CHECK: 16 PRINT "TOO LOW"
-# CHECK: 17 RETURN
-# CHECK: 18 PRINT "TOO HIGH"
-# CHECK: 19 RETURN
-# CHECK: 20 PRINT "CORRECT!"
-# CHECK: 21 INPUT "Play again? (1=yes, 2=no): ";A
-# CHECK: 22 ON A GOTO 2,24
-# CHECK: 23 GOTO 21
-# CHECK: 24 PRINT "Goodbye!"
-# CHECK: 25 END
+# CHECK-NEXT: 1 PRINT "I am thinking of a number from 1 to 10"
+# CHECK-NEXT: 2 N = INT(RND(1)*10)+1
+# CHECK-NEXT: 3 PRINT
+# CHECK-NEXT: 4 PRINT "Guess the number."
+# CHECK-NEXT: 5 INPUT "Your guess: ";G
+# CHECK-NEXT: 6 W = 0
+# CHECK-NEXT: 7 GOSUB 10
+# CHECK-NEXT: 8 IF W = 1 THEN 20
+# CHECK-NEXT: 9 GOTO 5
+# CHECK-NEXT: 10 IF G = N THEN 14
+# CHECK-NEXT: 11 IF G < N THEN 16
+# CHECK-NEXT: 12 IF G > N THEN 18
+# CHECK-NEXT: 13 RETURN
+# CHECK-NEXT: 14 W = 1
+# CHECK-NEXT: 15 RETURN
+# CHECK-NEXT: 16 PRINT "TOO LOW"
+# CHECK-NEXT: 17 RETURN
+# CHECK-NEXT: 18 PRINT "TOO HIGH"
+# CHECK-NEXT: 19 RETURN
+# CHECK-NEXT: 20 PRINT "CORRECT!"
+# CHECK-NEXT: 21 INPUT "Play again? (1=yes, 2=no): ";A
+# CHECK-NEXT: 22 ON A GOTO 2,24
+# CHECK-NEXT: 23 GOTO 21
+# CHECK-NEXT: 24 PRINT "Goodbye!"
+# CHECK-NEXT: 25 END
 # CHECK-NOT: REM

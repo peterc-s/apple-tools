@@ -1,0 +1,14 @@
+# RUN: uv run preprocess ../examples/multifile/main.bas | filecheck %s
+
+#CHECK: 0 GOTO 8
+#CHECK-NEXT: 1 PRINT "That's cool!"
+#CHECK-NEXT: 2 RETURN
+#CHECK-NEXT: 3 PRINT "You're epic!"
+#CHECK-NEXT: 4 GOSUB 1
+#CHECK-NEXT: 5 RETURN
+#CHECK-NEXT: 6 PRINT "You must also be a hacker..."
+#CHECK-NEXT: 7 RETURN
+#CHECK-NEXT: 8 PRINT "Guess what you are!"
+#CHECK-NEXT: 9 GOSUB 3
+#CHECK-NEXT: 10 GOSUB 6
+#CHECK-NEXT: 11 END

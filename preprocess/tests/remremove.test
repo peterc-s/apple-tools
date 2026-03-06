@@ -1,0 +1,4 @@
+# RUN: uv run preprocess ../examples/remremove.bas | filecheck %s
+
+#CHECK: 0 PRINT "This should not be REM oved."
+#CHECK-NEXT: 1 END
