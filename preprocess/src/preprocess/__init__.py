@@ -7,7 +7,7 @@ import fire
 NUMBER_REGEX = re.compile(r"^(\d+)\s")
 LABEL_REGEX = re.compile(r"^<([A-Za-z_]\w*)>\s*(.*)")
 AT_LABEL_REGEX = re.compile(r"@([A-Za-z_]\w*)")
-INCLUDE_REGEX = re.compile(r"^#INCLUDE\s\"([A-Za-z_.-]*)\"")
+INCLUDE_REGEX = re.compile(r"^#INCLUDE\s\"([A-Za-z\d_./-]*)\"")
 ENTRY_REGEX = re.compile(r":ENTRY:\s*")
 
 
@@ -203,7 +203,22 @@ class Preprocess:
         Allows for usage of <labels> at the start of lines and @labels to sub in
         the correct line number.
 
-        Automatically adds line numbers but supports manual line numbering.
+        Automatically adds line numbers but supports manual line numbering
+        (though I'd recommend against it).
+
+        Has support for including other files, however all files must be in
+        a flat directory structure or hack around the project path.
+
+        For example:
+        .
+        |- main.apl
+        |- lib/
+           |- lib.apl
+           |- lib2.apl
+
+        If `lib.apl` had `#INCLUDE "lib2.apl"`, this would not work if we
+        passed `main.apl` to the preprocessor. It would instead need to be
+        `#INCLUDE "lib/lib2.apl"`.
         """
         self.file = file
         self.code = read_file(file)
