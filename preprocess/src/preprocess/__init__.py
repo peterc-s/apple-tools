@@ -211,14 +211,14 @@ class Preprocess:
 
         For example:
         .
-        |- main.apl
+        |- main.bas
         |- lib/
-           |- lib.apl
-           |- lib2.apl
+           |- lib.bas
+           |- lib2.bas
 
-        If `lib.apl` had `#INCLUDE "lib2.apl"`, this would not work if we
-        passed `main.apl` to the preprocessor. It would instead need to be
-        `#INCLUDE "lib/lib2.apl"`.
+        If `lib.bas` had `#INCLUDE "lib2.bas"`, this would not work if we
+        passed `main.bas` to the preprocessor. It would instead need to be
+        `#INCLUDE "lib/lib2.bas"`.
 
         If you get an awful error, you are probably using the preprocessor
         in a way that it shouldn't be.

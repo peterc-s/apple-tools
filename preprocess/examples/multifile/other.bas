@@ -1,4 +1,4 @@
-#INCLUDE "other_nested.apl"
+#INCLUDE "other_nested.bas"
 <OTHER_EPIC> PRINT "You're epic!"
 GOSUB @OTHER_NESTED_COOL
 RETURN

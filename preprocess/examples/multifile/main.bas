@@ -1,5 +1,5 @@
-#INCLUDE "other.apl"
-#INCLUDE "lib/hack.apl"
+#INCLUDE "other.bas"
+#INCLUDE "lib/hack.bas"
 
 PRINT "Guess what you are!"
 GOSUB @OTHER_EPIC
