@@ -247,16 +247,16 @@ class Preprocess:
                 print("-- after includes --")
                 self._print()
 
-        # label removal (also stores labels)
-        self._collect_and_remove_labels()
-        if verbose:
-            print("-- after label collection and removal --")
-            self._print()
-
         # resolve entry + add goto jump
         self._resolve_entry_and_goto()
         if verbose:
             print("-- after resolving entry + goto injection --")
+            self._print()
+
+        # label removal (also stores labels)
+        self._collect_and_remove_labels()
+        if verbose:
+            print("-- after label collection and removal --")
             self._print()
 
         # line numbers (updates labels if needed)
