@@ -219,6 +219,9 @@ class Preprocess:
         If `lib.apl` had `#INCLUDE "lib2.apl"`, this would not work if we
         passed `main.apl` to the preprocessor. It would instead need to be
         `#INCLUDE "lib/lib2.apl"`.
+
+        If you get an awful error, you are probably using the preprocessor
+        in a way that it shouldn't be.
         """
         self.file = file
         self.code = read_file(file)
@@ -238,29 +241,29 @@ class Preprocess:
         # include resolving loop
         includes_found = True
         while includes_found:
-            # strip
-            self._strip_lines()
-            if verbose:
-                print("-- after stripping lines --")
-                self._print()
-
-            # remove empty
-            self._remove_empty_lines()
-            if verbose:
-                print("-- after removing empty lines --")
-                self._print()
-
-            # upper
-            self._upper()
-            if verbose:
-                print("-- after uppercasing --")
-                self._print()
-
             # includes
             includes_found = self._handle_includes()
             if verbose:
                 print("-- after includes --")
                 self._print()
+
+        # strip
+        self._strip_lines()
+        if verbose:
+            print("-- after stripping lines --")
+            self._print()
+
+        # remove empty
+        self._remove_empty_lines()
+        if verbose:
+            print("-- after removing empty lines --")
+            self._print()
+
+        # upper
+        self._upper()
+        if verbose:
+            print("-- after uppercasing --")
+            self._print()
 
         # resolve entry + add goto jump
         self._resolve_entry_and_goto()
