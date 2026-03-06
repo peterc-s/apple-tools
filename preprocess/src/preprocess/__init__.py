@@ -1,6 +1,7 @@
 import os
 import re
 from pathlib import Path
+from typing import Optional
 
 import fire
 
@@ -212,7 +213,12 @@ class Preprocess:
             print(line.strip())
         print()
 
-    def run(self, file: Path, verbose: bool = False):
+    def run(
+        self,
+        file: Path,
+        out: Optional[Path] = None,
+        verbose: bool = False,
+    ):
         """
         Preprocesses a set of files into a single, usable, basic program.
 
@@ -238,6 +244,11 @@ class Preprocess:
 
         If you get an awful error, you are probably using the preprocessor
         in a way that it shouldn't be.
+
+        Args:
+            file: The main file to run the preprocessor on.
+            out: The file to write the output too. Defaults to stdout.
+            verbose: Print after each pass of preprocessing.
         """
         self.file = file
         self.code = read_file(file)
@@ -325,7 +336,15 @@ class Preprocess:
 
         if verbose:
             print("-- final output --")
-        self._print()
+
+        if out is not None:
+            if verbose:
+                self._print()
+
+            with open(out, "w") as f:
+                f.write("\n".join(self.code))
+        else:
+            self._print()
 
 
 def main() -> None:
