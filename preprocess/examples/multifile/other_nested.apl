@@ -1,0 +1,2 @@
+<OTHER_NESTED_COOL> PRINT "That's cool!"
+RETURN

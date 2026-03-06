@@ -1,10 +1,14 @@
-import fire
-from pathlib import Path
+import os
 import re
+from pathlib import Path
+
+import fire
 
 NUMBER_REGEX = re.compile(r"^(\d+)\s")
 LABEL_REGEX = re.compile(r"^<([A-Za-z_]\w*)>\s*(.*)")
 AT_LABEL_REGEX = re.compile(r"@([A-Za-z_]\w*)")
+INCLUDE_REGEX = re.compile(r"^#INCLUDE\s\"([A-Za-z_.-]*)\"")
+ENTRY_REGEX = re.compile(r":ENTRY:\s*")
 
 
 def read_file(file: Path) -> list[str]:
@@ -13,13 +17,71 @@ def read_file(file: Path) -> list[str]:
 
 
 class Preprocess:
-
     def __init__(self):
         pass
 
     def _strip_lines(self):
         for line_num, line in enumerate(self.code):
             self.code[line_num] = line.strip()
+
+    def _mark_entry_point(self):
+        entry_count = 0
+        entry_line_index = None
+
+        for i, line in enumerate(self.code):
+            # only consider executable lines
+            if INCLUDE_REGEX.search(line):
+                continue
+            if len(line.strip()) == 0:
+                continue
+
+            if ENTRY_REGEX.search(line):
+                entry_count += 1
+                entry_line_index = i
+
+        if entry_count > 1:
+            raise RuntimeError(
+                "Multiple :ENTRY: definitions found in main file.",
+            )
+
+        # if entry exists, ensure it's only one and properly marked
+        if entry_count == 1:
+            # normalize by ensuring marker is present
+            self.entry_original_index = entry_line_index
+            return
+
+        # otherwise inject entry marker to first executable line
+        for i, line in enumerate(self.code):
+            if INCLUDE_REGEX.search(line):
+                continue
+            if len(line.strip()) == 0:
+                continue
+
+            self.code[i] = ":ENTRY: " + line
+            self.entry_original_index = i
+            break
+
+        # isn't python great
+        if not hasattr(self, "entry_original_index"):
+            raise RuntimeError(
+                "Could not find executable entry point to mark :ENTRY:.",
+            )
+
+    def _handle_includes(self) -> bool:
+        include_found = False
+        new_code = []
+
+        for line in self.code:
+            if (res := INCLUDE_REGEX.search(line)) is not None:
+                include_found = True
+                filename = res.group(1)
+                included_lines = read_file(os.path.dirname(self.file) / Path(filename))
+                new_code.extend(included_lines)
+            else:
+                new_code.append(line)
+
+        self.code = new_code
+        return include_found
 
     def _remove_empty_lines(self):
         self.code = list(filter(lambda line: len(line) != 0, self.code))
@@ -74,6 +136,37 @@ class Preprocess:
                 )
             self.labels[label] = int(res.group(1))
 
+    def _resolve_entry_and_goto(self):
+        entry_indices = []
+
+        for i, line in enumerate(self.code):
+            if ENTRY_REGEX.search(line):
+                entry_indices.append(i)
+
+        if len(entry_indices) > 1:
+            raise RuntimeError(
+                "Multiple :ENTRY: markers found after preprocessing.",
+            )
+
+        if len(entry_indices) == 0:
+            raise RuntimeError(
+                "No :ENTRY: marker found after preprocessing.",
+            )
+
+        entry_line_index = entry_indices[0]
+
+        # remove :ENTRY:
+        self.code[entry_line_index] = ENTRY_REGEX.sub(
+            "", self.code[entry_line_index]
+        ).strip()
+
+        if entry_line_index != 0:
+            self.code.insert(0, f"0 GOTO {entry_line_index + 1}")
+
+            # increment label line numbers
+            for label, line_num in self.labels.items():
+                self.labels[label] = line_num + 1
+
     def _substitute_labels(self):
         for line_num, line in enumerate(self.code):
 
@@ -85,9 +178,7 @@ class Preprocess:
                     )
                 return str(label_line_num)
 
-            # split on quoted strings so we don't accidentally replace inside
-            # a string literal the split keeps the quotes in the odd-indexed
-            # parts
+            # handling for string literals
             line_parts = re.split(r'(".*?")', line)
             changed = False
             for i, part in enumerate(line_parts):
@@ -123,31 +214,52 @@ class Preprocess:
             self._print()
 
         ## passes
-        # strip
-        self._strip_lines()
+        # mark the entry point
+        self._mark_entry_point()
         if verbose:
-            print("-- after stripping lines --")
+            print("-- after marking entry --")
             self._print()
 
-        # remove empty
-        self._remove_empty_lines()
-        if verbose:
-            print("-- after removing empty lines --")
-            self._print()
+        # include resolving loop
+        includes_found = True
+        while includes_found:
+            # strip
+            self._strip_lines()
+            if verbose:
+                print("-- after stripping lines --")
+                self._print()
 
-        # upper
-        self._upper()
-        if verbose:
-            print("-- after uppercasing --")
-            self._print()
+            # remove empty
+            self._remove_empty_lines()
+            if verbose:
+                print("-- after removing empty lines --")
+                self._print()
 
-        # label removal
+            # upper
+            self._upper()
+            if verbose:
+                print("-- after uppercasing --")
+                self._print()
+
+            # includes
+            includes_found = self._handle_includes()
+            if verbose:
+                print("-- after includes --")
+                self._print()
+
+        # label removal (also stores labels)
         self._collect_and_remove_labels()
         if verbose:
             print("-- after label collection and removal --")
             self._print()
 
-        # line numbers
+        # resolve entry + add goto jump
+        self._resolve_entry_and_goto()
+        if verbose:
+            print("-- after resolving entry + goto injection --")
+            self._print()
+
+        # line numbers (updates labels if needed)
         self._add_line_numbers()
         if verbose:
             print("-- after adding line numbers --")
