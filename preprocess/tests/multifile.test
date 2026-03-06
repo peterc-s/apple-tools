@@ -1,4 +1,4 @@
-# RUN: uv run preprocess ../examples/multifile/main.bas | filecheck %s
+# RUN: uv run preprocess ../examples/multifile/main.bas | FileCheck %s
 
 #CHECK: 0 GOTO 8
 #CHECK-NEXT: 1 PRINT "That's cool!"

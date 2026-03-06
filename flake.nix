@@ -14,10 +14,10 @@
     flake-utils.lib.eachDefaultSystem (
       system: let
         pkgs = nixpkgs.legacyPackages.${system};
-        libs = with pkgs; [];
+        libs = with pkgs; [libllvm];
       in {
         devShells.default = pkgs.mkShell {
-          buildInputs = with pkgs; [uv lit filecheck] ++ libs;
+          buildInputs = with pkgs; [uv lit] ++ libs;
 
           shellHook = ''
             export LD_LIBRARY_PATH=${pkgs.lib.makeLibraryPath libs}

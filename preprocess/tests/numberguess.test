@@ -1,4 +1,4 @@
-# RUN: uv run preprocess ../examples/numberguess.bas | filecheck %s
+# RUN: uv run preprocess ../examples/numberguess.bas | FileCheck %s
 
 # CHECK: 0 PRINT "NUMBER GUESSING GAME"
 # CHECK-NEXT: 1 PRINT "I am thinking of a number from 1 to 10"
