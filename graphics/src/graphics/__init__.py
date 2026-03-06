@@ -1,5 +1,4 @@
 from itertools import groupby
-from os import stat
 from pathlib import Path
 
 import fire

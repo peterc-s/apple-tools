@@ -6,6 +6,7 @@ requires-python = ">=3.14"
 members = [
     "apple-tools",
     "graphics",
+    "preprocess",
 ]
 
 [[package]]
@@ -35,6 +36,11 @@ dependencies = [
 
 [package.metadata]
 requires-dist = [{ name = "fire", specifier = ">=0.7.1" }]
+
+[[package]]
+name = "preprocess"
+version = "0.1.0"
+source = { editable = "preprocess" }
 
 [[package]]
 name = "termcolor"
